@@ -14,7 +14,7 @@ type Props = {
 
 export default function Categories({ title }: Props) {
   const [uiState, setUiState] = useState<UiState>('initial');
-  const [categories, setCategories] = useState<Paginated<Category> | null>(
+  const [categories, setCategories] = useState<Array<Category> | null>(
     null,
   );
 
@@ -35,7 +35,7 @@ export default function Categories({ title }: Props) {
     fetchData();
   }, []);
 
-  console.log(categories);
+  console.log("fetched categories: ", categories);
 
   return (
     <div className={styles.cats}>
@@ -45,9 +45,9 @@ export default function Categories({ title }: Props) {
       {uiState === 'error' && <p>Villa við að sækja flokka</p>}
       {uiState === 'data' && (
         <ul>
-          {categories?.data.map((category, index) => (
+          {categories?.map((category, index) => (
             <li key={index}>
-              <Link href={`/flokkar/${category.slug}`}>{category.name}</Link>
+              <Link href={`/flokkar/${category.slug}`}>{category.title}</Link>
             </li>
           ))}
         </ul>
