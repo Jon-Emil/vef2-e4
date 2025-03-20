@@ -8,6 +8,7 @@ export default function Navigation() {
       <ul>
         <li><Link href="/">Forsíða</Link></li>
         <li><Link href="/flokkar">Flokkar</Link></li>
+        <li><Link href="/nyspurning">Bæta við spurningu</Link></li>
       </ul>
     </nav>
   );

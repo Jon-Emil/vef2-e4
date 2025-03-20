@@ -26,3 +26,14 @@ export type Question = {
   cat_id: number;
   answers: Answer[];
 };
+
+export type AnswerToCreate = {
+  text: string;
+  correct: boolean;
+};
+
+export type QuestionToCreate = {
+  text: string;
+  cat_id: number;
+  answers: AnswerToCreate[];
+};

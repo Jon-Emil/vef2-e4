@@ -1,4 +1,4 @@
-import { Category, Paginated, Question } from "./types";
+import { Category, Paginated, Question, QuestionToCreate } from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:8000";
 
@@ -9,6 +9,40 @@ export class QuestionsApi {
       response = await fetch(url);
     } catch (e) {
       console.error("error fetching from api", url, e);
+      return null;
+    }
+
+    if (!response.ok) {
+      console.error("non 2xx status from API", url);
+      return null;
+    }
+
+    let json: unknown;
+    try {
+      json = await response.json();
+    } catch (e) {
+      console.error("error parsing json", url, e);
+      return null;
+    }
+
+    return json as T;
+  }
+
+  async createWithApi<T>(
+    url: string,
+    data: QuestionToCreate
+  ): Promise<T | null> {
+    let response: Response | undefined;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    } catch (e) {
+      console.error("error posting data to api", url, JSON.stringify(data), e);
       return null;
     }
 
@@ -50,6 +84,14 @@ export class QuestionsApi {
     const url = BASE_URL + "/questions/" + cat_id;
 
     const response = await this.fetchFromApi<Array<Question>>(url);
+
+    return response;
+  }
+
+  async makeQuestion(data: QuestionToCreate): Promise<Question | null> {
+    const url = BASE_URL + "/questions";
+
+    const response = await this.createWithApi<Question>(url, data);
 
     return response;
   }
