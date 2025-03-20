@@ -1,4 +1,10 @@
-
 .nav {
-  background-color: pink;
+  background-color: #a2a;
+}
+
+.nav > ul {
+  display: flex;
+  padding: 25px;
+  gap: 10px;
+  justify-content: center;
 }

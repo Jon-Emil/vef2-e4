@@ -14,6 +14,8 @@ export default function CreationForm() {
         cat_id: 0,
         answers: Array(4).fill({ text: '', correct: false }),
     });
+    const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState<string>("");
 
     useEffect(() => {
         async function fetchData() {
@@ -22,11 +24,11 @@ export default function CreationForm() {
           const api = new QuestionsApi();
           const categoriesResponse = await api.getCategories();
     
-          if (!categoriesResponse) {
+          if (!categoriesResponse.data) {
             setUiState('error');
           } else {
             setUiState('data');
-            setCategories(categoriesResponse);
+            setCategories(categoriesResponse.data);
           }
         }
         fetchData();
@@ -38,11 +40,17 @@ export default function CreationForm() {
         setQuestionToMake((prev) => ({ ...prev, answers: updatedAnswers }));
     };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const api = new QuestionsApi();
     console.log(questionToMake);
-    api.makeQuestion(questionToMake);
+    const response = await api.makeQuestion(questionToMake);
+    if (!response.data) {
+      const message = response.status < 500 ? `${response.status}: Röng gögn` : `${response.status}: Villa kom upp`;
+      setError(message);
+    }
+
+    setSubmitted(true);
   };
 
   return (
@@ -50,7 +58,21 @@ export default function CreationForm() {
         <h2>Búa til nýja spurningu</h2>
         {uiState === 'loading' && <p>Sæki gögn</p>}
         {uiState === 'error' && <p>Villa við að sækja gögn</p>}
-        {uiState === 'data' && (
+        {uiState === 'data' && (submitted ? (
+        <div>
+          {error ? <p>{error}</p> : <p>Spurning hefur verið búin til!</p>}
+          <button onClick={() => {
+            setSubmitted(false);
+            setQuestionToMake({
+              text: '',
+              cat_id: 0,
+              answers: Array(4).fill({ text: '', correct: false }),
+            });
+          }}>
+            Búa til aðra spurningu
+          </button>
+        </div>
+        ) :
         <form onSubmit={handleSubmit}>
           <label>
             Flokkur:

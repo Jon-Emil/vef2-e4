@@ -1,3 +1,6 @@
-.cats {
-  background-color: beige;
+.cats > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-top: 10px;
 }

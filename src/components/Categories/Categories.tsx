@@ -1,7 +1,7 @@
 'use client';
 
 import { QuestionsApi } from '@/api';
-import { Category, Paginated, UiState } from '@/types';
+import { Category, UiState } from '@/types';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import styles from './Categories.module.css';
@@ -25,11 +25,11 @@ export default function Categories({ title }: Props) {
       const api = new QuestionsApi();
       const categoriesResponse = await api.getCategories();
 
-      if (!categoriesResponse) {
+      if (!categoriesResponse.data) {
         setUiState('error');
       } else {
         setUiState('data');
-        setCategories(categoriesResponse);
+        setCategories(categoriesResponse.data);
       }
     }
     fetchData();

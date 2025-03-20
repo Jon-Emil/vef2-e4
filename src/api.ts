@@ -1,20 +1,25 @@
-import { Category, Paginated, Question, QuestionToCreate } from "./types";
+import {
+  apiResponse,
+  Category,
+  Question,
+  QuestionToCreate,
+} from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:8000";
 
 export class QuestionsApi {
-  async fetchFromApi<T>(url: string): Promise<T | null> {
+  async fetchFromApi<T>(url: string): Promise<apiResponse<T>> {
     let response: Response | undefined;
     try {
       response = await fetch(url);
     } catch (e) {
       console.error("error fetching from api", url, e);
-      return null;
+      return { data: null, status: 0 };
     }
 
     if (!response.ok) {
       console.error("non 2xx status from API", url);
-      return null;
+      return { data: null, status: response.status };
     }
 
     let json: unknown;
@@ -22,16 +27,16 @@ export class QuestionsApi {
       json = await response.json();
     } catch (e) {
       console.error("error parsing json", url, e);
-      return null;
+      return { data: null, status: response.status };
     }
 
-    return json as T;
+    return { data: json, status: response.status } as apiResponse<T>;
   }
 
   async createWithApi<T>(
     url: string,
     data: QuestionToCreate
-  ): Promise<T | null> {
+  ): Promise<apiResponse<T>> {
     let response: Response | undefined;
     try {
       response = await fetch(url, {
@@ -43,12 +48,12 @@ export class QuestionsApi {
       });
     } catch (e) {
       console.error("error posting data to api", url, JSON.stringify(data), e);
-      return null;
+      return { data: null, status: 0 };
     }
 
     if (!response.ok) {
       console.error("non 2xx status from API", url);
-      return null;
+      return { data: null, status: response.status };
     }
 
     let json: unknown;
@@ -56,21 +61,21 @@ export class QuestionsApi {
       json = await response.json();
     } catch (e) {
       console.error("error parsing json", url, e);
-      return null;
+      return { data: null, status: response.status };
     }
 
-    return json as T;
+    return { data: json, status: response.status } as apiResponse<T>;
   }
 
-  async getCategory(slug: string): Promise<Category | null> {
+  async getCategory(slug: string): Promise<apiResponse<Category>> {
     const url = BASE_URL + `/categories/${slug}`;
 
-    const response = await this.fetchFromApi<Category | null>(url);
+    const response = await this.fetchFromApi<Category>(url);
 
     return response;
   }
 
-  async getCategories(): Promise<Array<Category> | null> {
+  async getCategories(): Promise<apiResponse<Array<Category>>> {
     const url = BASE_URL + "/categories";
 
     const response = await this.fetchFromApi<Array<Category>>(url);
@@ -80,7 +85,9 @@ export class QuestionsApi {
     return response;
   }
 
-  async getQuestionsFromCatID(cat_id: string): Promise<Array<Question> | null> {
+  async getQuestionsFromCatID(
+    cat_id: string
+  ): Promise<apiResponse<Array<Question>>> {
     const url = BASE_URL + "/questions/" + cat_id;
 
     const response = await this.fetchFromApi<Array<Question>>(url);
@@ -88,7 +95,7 @@ export class QuestionsApi {
     return response;
   }
 
-  async makeQuestion(data: QuestionToCreate): Promise<Question | null> {
+  async makeQuestion(data: QuestionToCreate): Promise<apiResponse<Question>> {
     const url = BASE_URL + "/questions";
 
     const response = await this.createWithApi<Question>(url, data);

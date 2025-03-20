@@ -9,6 +9,7 @@ export function Category({ slug }: { slug: string }) {
   const [uiState, setUiState] = useState<UiState>('initial');
   const [category, setCategory] = useState<CategoryType | null>(null);
   const [questions, setQuestions] = useState<Array<QuestionType> | null>(null);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     async function fetchData() {
@@ -17,18 +18,19 @@ export function Category({ slug }: { slug: string }) {
       const api = new QuestionsApi();
       const catResponse = await api.getCategory(slug);
 
-      if (!catResponse) {
+      if (!catResponse.data) {
         setUiState('error');
+        setError(catResponse.status < 500 ? `${catResponse.status}: flokkur fannst ekki` : `${catResponse.status}: Villa kom upp`)
         return
       }
-      setCategory(catResponse);
+      setCategory(catResponse.data);
 
-      const qResponse = await api.getQuestionsFromCatID(catResponse.id);
+      const qResponse = await api.getQuestionsFromCatID(catResponse.data.id);
 
-      if (!qResponse) {
+      if (!qResponse.data) {
         setUiState("error");
       } else {
-        setQuestions(qResponse);
+        setQuestions(qResponse.data);
         setUiState("data");
       }
     }
@@ -38,10 +40,10 @@ export function Category({ slug }: { slug: string }) {
   return <div>
   <h1>{category?.title}</h1>
   {uiState === 'loading' && <p>Sæki flokk</p>}
-  {uiState === 'error' && <p>Villa við að sækja flokk</p>}
+  {uiState === 'error' && (error ? <p>{error}</p> : <p>500: Villa við að sækja flokk</p>)}
   {uiState === 'data' && (
     <ul>
-      {questions?.map((question, index) => (
+      {questions?.length === 0 ? <p>engar spurningar fundust í þessum flokk</p> : questions?.map((question, index) => (
         <li key={index}>
           <Question question={question} ></Question>
         </li>

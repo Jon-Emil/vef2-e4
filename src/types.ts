@@ -37,3 +37,8 @@ export type QuestionToCreate = {
   cat_id: number;
   answers: AnswerToCreate[];
 };
+
+export type apiResponse<T> = {
+  data: T | null;
+  status: number;
+};

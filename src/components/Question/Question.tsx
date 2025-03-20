@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Question as QuestionType } from '@/types';
 import { useState } from "react";
 import styles from "./Question.module.css";
@@ -11,15 +10,15 @@ export default function Question({ question }: { question: QuestionType }) {
   };
   
   return (
-    <div className={styles.question}>
+    <div>
       <h3>{question.text}</h3>
-      <ul className={styles.answerList}>
+      <ul>
         {question.answers.map((answer) => {
           const isSelected = selectedAnswer === answer.id;
           const className = isSelected ? (answer.correct ? styles.correct : styles.incorrect) : "";
 
           return (
-            <li key={answer.id} className={styles.answer}>
+            <li key={answer.id} className={styles.answers}>
               <label className={className}>
                 <input
                   type="radio"
